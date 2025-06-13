@@ -355,15 +355,15 @@
   const getColorStyle = (val) => {
     const v = parseFloat(val.replace('%', '').trim());
     if (isNaN(v)) return '';
-    if (v > 1.25) return 'color: red; font-weight: bold;';
-    if (v > 1) return 'color: orange; font-weight: bold;';
+    if (v > 1) return 'color: red; font-weight: bold;';
+    if (v > 0.8) return 'color: orange; font-weight: bold;';
     return '';
   };
 
   const vstValParser = (val) => {
     const v = parseFloat((val || '').replace(" sec", "").trim());
     if (isNaN(v)) return '';
-    if (v > 10) return 'color: red; font-weight: bold;';
+    if (v > 8) return 'color: red; font-weight: bold;';
     return '';
   };
 
