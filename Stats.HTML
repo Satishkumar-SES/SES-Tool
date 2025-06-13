@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Conviva Stats</title>
+  <style>
+    :root {
+      --bg-light: #f4f7fa;
+      --bg-dark: #1e1e2f;
+      --text-light: #2c3e50;
+      --text-dark: #ecf0f1;
+      --table-header-light: #34495e;
+      --table-header-dark: #2c3e50;
+      --btn-blue: #2980b9;
+      --btn-green: #27ae60;
+    }
+ 
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      transition: all 0.3s ease;
+      min-height: 100vh;
+    }
+ 
+    /* Login background with image */
+    #loginBox {
+      background: url("https://wallpapercat.com/w/full/4/6/a/46650-1920x1080-desktop-full-hd-2022-fifa-world-cup-wallpaper-image.jpg") no-repeat center center/cover;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+ 
+    .login-container {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 40px;
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      text-align: center;
+      color: white;
+      animation: fadeIn 1.5s ease-in-out;
+      position: relative;
+      width: 320px;
+    }
+ 
+    .login-container h2 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 4px black;
+    }
+ 
+    .login-container input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+ 
+    .password-wrapper {
+      position: relative;
+      width: 100%;
+    }
+ 
+    .password-wrapper input {
+      width: 100%;
+      padding-right: 40px; /* space for the eye icon */
+    }
+ 
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: white;
+      font-size: 20px;
+      user-select: none;
+      opacity: 0.8;
+    }
+ 
+    .toggle-password:hover {
+      opacity: 1;
+    }
+ 
+    .login-container button {
+      margin-top: 15px;
+      padding: 12px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #1abc9c;
+      color: white;
+      animation: pulse 2s infinite;
+    }
+ 
+    #loginError {
+      color: yellow;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+ 
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(26, 188, 156, 0.7); }
+      70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(26, 188, 156, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(26, 188, 156, 0); }
+    }
+ 
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+ 
+    #toolContent {
+      padding: 30px;
+      display: none;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+    }
+ 
+    body.dark-mode #toolContent {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+ 
+    textarea {
+      width: 100%;
+      height: 250px;
+      padding: 12px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+ 
+    .button-group {
+      text-align: center;
+      margin: 20px 0;
+    }
+ 
+    button {
+      margin: 5px 10px;
+      padding: 10px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+ 
+    .convert-btn { background-color: var(--btn-blue); color: #fff; }
+    .copy-btn { background-color: var(--btn-green); color: #fff; }
+    .toggle-mode-btn { background-color: #7f8c8d; color: #fff; float: right; }
+    .logout-btn { background-color: red; color: #fff; float: right; margin-right: 10px; }
+ 
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+      background-color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+ 
+    body.dark-mode table { background-color: #2f3640; }
+ 
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+    }
+ 
+    th {
+      background-color: var(--table-header-light);
+      color: white;
+    }
+ 
+    body.dark-mode th {
+      background-color: var(--table-header-dark);
+    }
+  </style>
+</head>
+<body>
+ 
+  <!-- LOGIN PAGE -->
+  <div id="loginBox">
+    <div class="login-container">
+      <h2>⚽️Club World Cup⚽️</h2>
+      <input type="text" id="username" placeholder="Username" /><br>
+      <div class="password-wrapper">
+        <input type="password" id="password" placeholder="Password" />
+        <span id="togglePassword" class="toggle-password" title="Show/Hide Password">👁️</span>
+      </div>
+      <button onclick="validateLogin()">Login</button>
+      <p id="loginError"></p>
+    </div>
+  </div>
+ 
+  <!-- TOOL MAIN CONTENT -->
+  <div id="toolContent">
+    <button class="logout-btn" onclick="logout()">Logout</button>
+    <button class="toggle-mode-btn" onclick="toggleDarkMode()">🌙</button>
+    <h1>📊 Conviva Stats </h1>
+    <textarea id="rawInput" placeholder="Paste your raw data here..."></textarea>
+    <div class="button-group">
+      <button class="convert-btn" onclick="convertToTable()">Convert to Table</button>
+      <button class="copy-btn" onclick="copyTableToClipboard()">Copy Table</button>
+    </div>
+    <div id="tableOutput"></div>
+  </div>
+ 
+  <script>
+    // Toggle password visibility
+    document.getElementById('togglePassword').addEventListener('click', function () {
+      const pwdInput = document.getElementById('password');
+      if (pwdInput.type === 'password') {
+        pwdInput.type = 'text';
+        this.textContent = '🙈';
+      } else {
+        pwdInput.type = 'password';
+        this.textContent = '👁️';
+      }
+    });
+ 
+    function validateLogin() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+      if (user === "SES" && pass === "Dazn_SES") {
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("toolContent").style.display = "block";
+      } else {
+        document.getElementById("loginError").innerText = "Invalid credentials!";
+      }
+    }
+ 
+    function logout() {
+      document.getElementById("toolContent").style.display = "none";
+      document.getElementById("loginBox").style.display = "flex";
+      document.getElementById("username").value = "";
+      document.getElementById("password").value = "";
+      document.getElementById("loginError").innerText = "";
+      document.getElementById('password').type = 'password';
+      document.getElementById('togglePassword').textContent = '👁️';
+    }
+ 
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+    }
+ 
+    function convertToTable() {
+  const rawText = document.getElementById('rawInput').value;
+  const lines = rawText.split('\n').map(line => line.trim()).filter(Boolean);
+  const tableDiv = document.getElementById('tableOutput');
+  tableDiv.innerHTML = '';
+
+  const rows = [];
+
+  const isHeadendBlock = lines.some(line => /^(DCA|DCB|DCC|DCD|DCG|DCH)$/i.test(line));
+  const isOverallBlock = lines.some(line => line.toLowerCase().includes("video start failures"));
+  const isCodecBlock = lines[0]?.toLowerCase().includes("video codec") || lines[0]?.toLowerCase().includes("audio codec");
+  const isProtocolOrCDNBlock = lines[0]?.toLowerCase().includes("protocol performance") || lines[0]?.toLowerCase().includes("cdn performance");
+
+  if (isProtocolOrCDNBlock) {
+    const startIndex = 1;
+    const filterIndex = lines.findIndex(line => line.toLowerCase() === 'filter name');
+    const metricEndIndex = filterIndex !== -1 ? filterIndex : lines.length;
+    const metricLines = lines.slice(startIndex, metricEndIndex);
+
+    const metricsPerRow = 6;
+    const totalRows = Math.floor(metricLines.length / metricsPerRow);
+
+    const labelLines = filterIndex !== -1 ? lines.slice(filterIndex + 8, lines.lastIndexOf('Filter Name')) : [];
+
+    for (let i = 0; i < totalRows; i++) {
+      const idx = i * metricsPerRow;
+      const label = labelLines[i] || `Row ${i + 1}`;
+      rows.push({
+        headend: label,
+        concurrent: metricLines[idx] || '',
+        plays: metricLines[idx + 1] || '',
+        vpf: metricLines[idx + 2] || '',
+        vsf: metricLines[idx + 3] || '',
+        cirr: metricLines[idx + 4] || '',
+        ebvs: metricLines[idx + 5] || ''
+      });
+    }
+  } else if (isHeadendBlock) {
+    for (let i = 0; i < lines.length; i++) {
+      if (/^(DCA|DCB|DCC|DCD|DCG|DCH)$/i.test(lines[i])) {
+        rows.push({
+          headend: lines[i],
+          concurrent: lines[i + 1],
+          plays: lines[i + 2],
+          vpf: lines[i + 3],
+          vsf: lines[i + 4],
+          cirr: lines[i + 5],
+          ebvs: lines[i + 6]
+        });
+        i += 6;
+      }
+    }
+  } else if (isOverallBlock) {
+    const map = {};
+    for (let i = 0; i < lines.length - 2; i += 3) {
+      const label = lines[i].replace(/\s+/g, ' ').trim();
+      const value = `${lines[i + 1]} ${lines[i + 2]}`.trim();
+      map[label] = value;
+    }
+    rows.push({
+      headend: 'Overall',
+      concurrent: map['Concurrent Plays'] || '',
+      plays: map['Plays'] || '',
+      vpf: map['Video Playback Failures Technical (%)'] || '',
+      vsf: map['Video Start Failures Technical (%)'] || '',
+      cirr: map['Connection Induced Rebuffering Ratio'] || '',
+      ebvs: map['Video Start Time'] || ''
+    });
+  } else if (isCodecBlock) {
+    let filterIndex = lines.findIndex(line => line.toLowerCase() === 'filter name');
+    if (filterIndex === -1) {
+      tableDiv.innerHTML = "<p>Missing 'Filter Name' line for codec block.</p>";
+      return;
+    }
+    const metricLines = lines.slice(1, filterIndex);
+    const codecNames = lines.slice(filterIndex + 1).filter(name =>
+      !["Concurrent Plays", "Plays", "VSF-T (%)", "VPF-T (%)", "CIRR", "VST", "Filter Name"].includes(name)
+    );
+
+    for (let i = 0; i < codecNames.length; i++) {
+      const idx = i * 6;
+      rows.push({
+        headend: codecNames[i] || `Codec ${i + 1}`,
+        concurrent: metricLines[idx] || '',
+        plays: metricLines[idx + 1] || '',
+        vpf: metricLines[idx + 2] || '',
+        vsf: metricLines[idx + 3] || '',
+        cirr: metricLines[idx + 4] || '',
+        ebvs: metricLines[idx + 5] || ''
+      });
+    }
+  }
+
+  if (rows.length === 0) {
+    tableDiv.innerHTML = "<p>No valid data found.</p>";
+    return;
+  }
+
+  const getColorStyle = (val) => {
+    const v = parseFloat(val.replace('%', '').trim());
+    if (isNaN(v)) return '';
+    if (v > 1.25) return 'color: red; font-weight: bold;';
+    if (v > 1) return 'color: orange; font-weight: bold;';
+    return '';
+  };
+
+  const vstValParser = (val) => {
+    const v = parseFloat((val || '').replace(" sec", "").trim());
+    if (isNaN(v)) return '';
+    if (v > 10) return 'color: red; font-weight: bold;';
+    return '';
+  };
+
+  let html = '<table id="statsTable">';
+  html += `
+    <tr>
+      <th>Codec / Headend</th>
+      <th>Concurrent Plays</th>
+      <th>Plays</th>
+      <th>VPF-T (%)</th>
+      <th>VSF-T (%)</th>
+      <th>CIRR (%)</th>
+      <th>VST</th>
+    </tr>
+  `;
+
+  rows.forEach(row => {
+    html += `
+      <tr>
+        <td>${row.headend}</td>
+        <td>${row.concurrent}</td>
+        <td>${row.plays}</td>
+        <td style="${getColorStyle(row.vpf)}">${row.vpf}</td>
+        <td style="${getColorStyle(row.vsf)}">${row.vsf}</td>
+        <td style="${getColorStyle(row.cirr)}">${row.cirr}</td>
+        <td style="${vstValParser(row.ebvs)}">${row.ebvs}</td>
+      </tr>
+    `;
+  });
+
+  html += '</table>';
+  tableDiv.innerHTML = html;
+}
+
+ 
+    function copyTableToClipboard() {
+      const table = document.getElementById("statsTable");
+      if (!table) return;
+      const htmlTable = table.outerHTML;
+      const blob = new Blob([htmlTable], { type: "text/html" });
+      const data = [new ClipboardItem({ "text/html": blob })];
+      navigator.clipboard.write(data).then(() => {
+        alert("✅ Table copied! You can paste it where needed.");
+      });
+    }
+  </script>
+</body>
+</html>
